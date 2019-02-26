@@ -3,6 +3,7 @@ from os import walk
 from os.path import getsize
 from itertools import groupby
 from hashlib import md5
+from json import dumps
 
 
 def do_argparse():
@@ -87,18 +88,25 @@ def group_files_by_checksum(file_path_names):
 def find_all_duplicate_files(file_path_names):
     """ returns a list of groups of duplicate files """
     sizeGrouped_files = group_files_by_size(file_path_names)
-    checksumGrouped_files = group_files_by_checksum(sizeGrouped_files)
-    print(checksumGrouped_files)
+    result = []
+    for group in sizeGrouped_files:
+        checksumGrouped_files = group_files_by_checksum(group)
+        for checksumGroup in checksumGrouped_files:
+            if len(checksumGroup) > 1:
+                result.append(checksumGroup)
+    return result
+
+
+def json_convert(duplicate_file_ls):
+    """ convert duplicate_file_ls to json expression """
+    return dumps(duplicate_file_ls)
 
 
 def main():
     root_path = do_argparse()
     file_path_names = scan_files(root_path)
-    grouped_files = group_files_by_size(file_path_names)
-    print(grouped_files)
-    print(get_file_checksum('/home/dtran00/intek_file_finder/test/1'))
-    print(group_files_by_checksum(['/home/dtran00/intek_file_finder/test/3', '/home/dtran00/intek_file_finder/test/test1/ha']))
-    print('find all dup files: ', find_all_duplicate_files(file_path_names))
+    result = find_all_duplicate_files(file_path_names)
+    print(json_convert(result))
 
 
 if __name__ == '__main__':
