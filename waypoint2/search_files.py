@@ -8,4 +8,5 @@ def scan_files(path):
     for dirpath, _, filenames in walk(path):
         for filename in filenames:
             files_ls.append(dirpath + '/' + filename)
+    files_ls.sort()
     return files_ls
